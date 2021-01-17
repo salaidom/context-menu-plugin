@@ -4,7 +4,9 @@
   @mouseover="showSubitems()"
   @mouseleave="timeoutHide()"
   :class="{ hasSubitems }"
-) {{item.title}}
+) .main-content
+    .main-content-title {{item.title}}
+    .main-content-description {{item.description}}
   .subitems(v-show="hasSubitems && this.visibleSubitems")
     Item(v-for="subitem in item.subitems"
       :key="subitem.title"
@@ -15,21 +17,21 @@
 </template>
 
 <script>
-import hideMixin from './debounceHide'
+import hideMixin from "./debounceHide";
 
 export default {
-  name: 'Item',
-  mixins: [hideMixin('hideSubitems')],
+  name: "Item",
+  mixins: [hideMixin("hideSubitems")],
   props: { item: Object, args: Object },
   data() {
     return {
-      visibleSubitems: false, 
-    }
+      visibleSubitems: false,
+    };
   },
   computed: {
     hasSubitems() {
-      return this.item.subitems
-    }
+      return this.item.subitems;
+    },
   },
   methods: {
     showSubitems() {
@@ -41,15 +43,13 @@ export default {
     },
     onClick(e) {
       e.stopPropagation();
-      
-      if(this.item.onClick)
-        this.item.onClick(this.args);
-      this.$root.$emit('hide');
-    }
-  }
-}
-</script>
 
+      if (this.item.onClick) this.item.onClick(this.args);
+      this.$root.$emit("hide");
+    },
+  },
+};
+</script>
 
 <style lang="sass" scoped>
 @import '../vars.sass'
@@ -57,6 +57,14 @@ export default {
 
 .item
   @extend .item
+  .main-content
+      display: flex
+      flex-direction: column
+    .main-content-title
+      color: #333
+      font-weight: bold
+    .main-content-description
+      color: #666666
   &.hasSubitems:after
     content: '►'
     position: absolute
