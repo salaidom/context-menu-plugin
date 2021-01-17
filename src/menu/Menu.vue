@@ -18,50 +18,49 @@
 </template>
 
 <script>
-import hideMixin from './debounceHide'
-import Item from './Item.vue';
-import Search from './Search.vue';
-import { fitViewport } from '../utils';
+import hideMixin from "./debounceHide";
+import Item from "./Item.vue";
+import Search from "./Search.vue";
+import { fitViewport } from "../utils";
 
 export default {
   props: { searchBar: Boolean, searchKeep: Function },
-  mixins: [hideMixin('hide')],
+  mixins: [hideMixin("hide")],
   data() {
     return {
       x: 0,
       y: 0,
       visible: false,
       args: {},
-      filter: '',
+      filter: "",
       items: [],
-    }
+    };
   },
   computed: {
     style() {
       return {
-        top: this.y+'px', 
-        left: this.x+'px'
-      }
+        top: this.y + "px",
+        left: this.x + "px",
+      };
     },
     filtered() {
-      if(!this.filter) return this.items;
-      const regex = new RegExp(this.filter, 'i');
-      
-      return this.extractLeafs(this.items)
-        .filter(({ title }) => {
-          return this.searchKeep(title) || title.match(regex)
-        });
-    }
+      if (!this.filter) return this.items;
+      const regex = new RegExp(this.filter, "i");
+
+      return this.extractLeafs(this.items).filter(({ title }) => {
+        return this.searchKeep(title) || title.match(regex);
+      });
+    },
   },
   methods: {
     extractLeafs(items) {
-      if(!items) return [];
+      if (!items) return [];
       let leafs = [];
-      items.map(item => {
-        if(!item.subitems) leafs.push(item)
+      items.map((item) => {
+        if (!item.subitems) leafs.push(item);
 
-        leafs.push(...this.extractLeafs(item.subitems))
-      })
+        leafs.push(...this.extractLeafs(item.subitems));
+      });
 
       return leafs;
     },
@@ -73,45 +72,44 @@ export default {
       this.x = x;
       this.y = y;
       this.args = args;
-  
+
       this.cancelHide();
     },
     hide() {
       this.visible = false;
     },
-    additem(title, onClick, path = []) {
+    additem(title, description, onClick, path = []) {
       let items = this.items;
-      for(let level of path) {
-        let exist = items.find(i => i.title === level);
+      for (let level of path) {
+        let exist = items.find((i) => i.title === level);
 
-        if(!exist) {
+        if (!exist) {
           exist = { title: level, subitems: [] };
-          items.push(exist)
+          items.push(exist);
         }
 
         items = exist.subitems || (exist.subitems = []);
       }
 
-      items.push({ title, onClick });
+      items.push({ title, description, onClick });
     },
   },
   updated() {
-    if(this.$refs.menu) {
-      [this.x, this.y] = fitViewport([this.x, this.y], this.$refs.menu)
-    } 
+    if (this.$refs.menu) {
+      [this.x, this.y] = fitViewport([this.x, this.y], this.$refs.menu);
+    }
   },
   mounted() {
-    this.$root.$on('show', this.show);
-    this.$root.$on('hide', this.hide);
-    this.$root.$on('additem', this.additem);
+    this.$root.$on("show", this.show);
+    this.$root.$on("hide", this.hide);
+    this.$root.$on("additem", this.additem);
   },
   components: {
     Item,
-    Search
-  }
-}
+    Search,
+  },
+};
 </script>
-
 
 <style lang="sass" scoped>
 @import '../vars.sass'
